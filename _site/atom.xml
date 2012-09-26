@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+ 
+ <title>Jan Henrik Gundelsby</title>
+ <link href="http://janhenrik.github.com/atom.xml" rel="self"/>
+ <link href="http://janhenrik.github.com/"/>
+ <updated>2012-09-26T18:34:46+02:00</updated>
+ <id>http://janhenrik.github.com/</id>
+ <author>
+   <name>Jan Henrik Gundelsby</name>
+   <email>janhenrik@gundelsby.com</email>
+ </author>
+
+ 
+ <entry>
+   <title>Test of blogpost</title>
+   <link href="http://janhenrik.github.com/2012/09/26/test-blog-post.html"/>
+   <updated>2012-09-26T00:00:00+02:00</updated>
+   <id>http://janhenrik.github.com/2012/09/26/test-blog-post</id>
+   <content type="html">&lt;h1&gt;Test of blogpost&lt;/h1&gt;
+
+&lt;p class=&quot;meta&quot;&gt;26 Sep 2012 - Oslo&lt;/p&gt;
+
+
+&lt;p&gt;To be continued...&lt;/p&gt;
+</content>
+ </entry>
+ 
+ 
+</feed>
