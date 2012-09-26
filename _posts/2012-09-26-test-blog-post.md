@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Test of blogpost
+title: First
 ---
 
 {{ page.title }}

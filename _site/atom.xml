@@ -4,7 +4,7 @@
  <title>Jan Henrik Gundelsby</title>
  <link href="http://gundelsby.com/atom.xml" rel="self"/>
  <link href="http://gundelsby.com/"/>
- <updated>2012-09-26T20:18:16+02:00</updated>
+ <updated>2012-09-26T20:23:46+02:00</updated>
  <id>http://gundelsby.com/</id>
  <author>
    <name>Jan Henrik Gundelsby</name>
@@ -13,11 +13,11 @@
 
  
  <entry>
-   <title>Test of blogpost</title>
+   <title>First</title>
    <link href="http://gundelsby.com/2012/09/26/test-blog-post.html"/>
    <updated>2012-09-26T00:00:00+02:00</updated>
    <id>http://gundelsby.com/2012/09/26/test-blog-post</id>
-   <content type="html">&lt;h1&gt;Test of blogpost&lt;/h1&gt;
+   <content type="html">&lt;h1&gt;First&lt;/h1&gt;
 
 &lt;p class=&quot;meta&quot;&gt;26 Sep 2012 - Oslo&lt;/p&gt;
 
