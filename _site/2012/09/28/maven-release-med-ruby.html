@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+   <title>Maven release med Ruby</title>
+   <meta name="author" content="Jan Henrik Gundelsby" />
+   <meta name="readability-verification" content="QCzSs992GxmRYRKVpPeZ6LE2tS8aYKxsSSQKV8YM"/>
+
+   <!-- syntax highlighting CSS -->
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+
+   <!-- Homepage CSS -->
+   <link rel="stylesheet" href="/css/screen.css" type="text/css" media="screen, projection" />
+
+   <!-- Typekit -->
+   <script type="text/javascript" src="http://use.typekit.com/jpd0pfm.js"></script>
+   <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+  <!-- Google Analytics -->
+  <script type="text/javascript">
+
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-35123816-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+  </script>
+  <!-- Google Analytics end -->
+</head>
+<body>
+
+<div class="site">
+  <div class="title">
+    <a href="/">Jan Henrik Gundelsby</a>
+    <a class="extra" href="/">home</a>
+  </div>
+  
+  <div id="post">
+<h1>Maven release med Ruby</h1>
+
+<p>Mange av oss bruker <a href="http://maven.apache.org">Maven</a> for å bygge, versjonere og holde styr på avhengigheter både til eksterne biblioteker og egne. Maven har også en <a href="http://maven.apache.org/plugins/maven-release-plugin/">release plugin</a> som er Mavens forsøk på å standardisere en release-prosess, og det gjør den i tre faser over flere steg.</p>
+
+<ul>
+<li>Prepare a release, <a href="http://maven.apache.org/plugins/maven-release-plugin/examples/prepare-release.html">mvn release:prepare</a></li>
+<li>Perform a release, <a href="http://maven.apache.org/plugins/maven-release-plugin/examples/perform-release.html">mvn release:perform</a></li>
+<li>Rollback a release, <a href="http://maven.apache.org/plugins/maven-release-plugin/rollback-mojo.html">mvn release:rollback</a></li>
+</ul>
+
+
+<p>Innføring av denne i vårt prosjekt bød på flere problemer. Prosjektet vårt har en del andre krav enn det Maven release-pluginen forventer. Vi bruker git istedet for subversion, vi har standardiserte måter å versjonere komponenter på, slik at neste versjon alltid kan utledes av forrige. I tillegg synes vi release-prosessen til Maven brukte evigheter på å analysere, bygge og starte opp. Derfor forsøkte vi å skrive dette selv, med utgangspunkt i Maven sin dokumentasjon. Prosjektet hadde kompetanse på Ruby, og vi følte dette var et godt utgangspunkt for å parse XML og enkelt kunne kjøre git-kommandoer. Følgende er vår løsning på stegene beskrevet i Maven sin release-prosess:</p>
+
+<h4>mvn release:prepare: 1. Check that there are no uncommitted changes in the sources</h4>
+
+<p>Dette er lett å implementere. En oneliner med git.</p>
+
+<p><code>ruby
+def clean_wd?
+  `git status --porcelain -- . | wc -l`.strip == "0"
+end
+</code></p>
+
+<h4>mvn release:prepare: 2. Check that there are no SNAPSHOT dependencies</h4>
+
+<p>Vi bruker <a href="http://nokogiri.org">Nokogiri</a> for å parse XML, Ruby trenger ikke å kjenne til Mavens dependency-tre for de enkle tingene release-prossen skal gjøre. I og med at det er veldefinerte steder i POM-filene SNAPSHOT-dependencies kan være, var dette trivielt.</p>
+
+<p>```ruby
+def snapshot_dependencies?</p>
+
+<pre><code>self.search('dependency').each do |dep|
+  dep.search('version').each do |ver|
+    if ver.content =~ /SNAPSHOT/i
+      raise("Prosjektet #{artifactId} har SNAPSHOT avhengigheter
+</code></pre>
+
+<p>               i artifact: #{artifactIdForDep(dep)}-#{ver.content}")</p>
+
+<pre><code>    end
+  end
+end
+</code></pre>
+
+<h1>Tilsvarende for <properties> og project > parent > version  # for super-pom</h1>
+
+<p>```</p>
+
+<h4>mvn release:prepare: 3. Change the version in the POMs from x-SNAPSHOT to a new version (you will be prompted for the versions to use)</h4>
+
+<p>Vi har veldefinerte regler for bumping av versjonsnummer. Alltid minor-versjon, evt. patchversjon dersom det er spesifisert på kommandolinjen inn til scriptet.</p>
+
+<p>```ruby
+def neste_snapshot release_version
+  versionsnummer = release_version.split('.')
+  major = versionsnummer[0].to_i
+  minor = versionsnummer[1].to_i
+  patch = versionsnummer[2].to_i</p>
+
+<p>  if patch == 0</p>
+
+<pre><code>return "#{major}.#{minor+1}.0"
+</code></pre>
+
+<p>  else</p>
+
+<pre><code>return "#{major}.#{minor}.#{patch+1}"
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<h4>mvn release:prepare: 4. Transform the SCM information in the POM to include the final destination of the tag</h4>
+
+<p>Et unødvendig steg, for å være helt ærlig skjønner vi ikke hva som menes. Dersom vi ikke forstår det, bør vi mest sannsynlig heller ikke implementere noe.</p>
+
+<h4>mvn release:prepare: 5. Run the project tests against the modified POMs to confirm everything is in working order</h4>
+
+<p>Dette er eneste gangen vi bygger prosjektet og sjekker at alle tester kjører.</p>
+
+<p>```ruby
+mvn_success = system("mvn -U clean package >> /tmp/mvn_build")
+  unless mvn_success</p>
+
+<pre><code>raise("Build failure")
+</code></pre>
+
+<p>  end
+```</p>
+
+<h4>mvn release:prepare: 6. Commit the modified POMs</h4>
+
+<p>Commit av release-versjonen til git.</p>
+
+<p><code>``ruby
+</code>git commit pom.xml */pom.xml -m "[release.rb] Release ny versjon av
+                  #{super_pom.artifactId}-#{release_version}"`</p>
+
+<p>```</p>
+
+<h4>mvn release:prepare: 7. Tag the code in the SCM with a version name (this will be prompted for)</h4>
+
+<p>Tag av kode for release-versjonen.</p>
+
+<p>```ruby
+unless system("git tag -f #{super_pom.artifactId}-#{release_version}")</p>
+
+<pre><code>raise("Could not create tag.")
+</code></pre>
+
+<p>  end
+```</p>
+
+<h4>mvn release:prepare: 8. Bump the version in the POMs to a new value y-SNAPSHOT (these values will also be prompted for)</h4>
+
+<p>Igjen er det en veldefinert måte å bumpe versjonsnummer på, denne gangen til neste utviklingsversjon.</p>
+
+<p><code>ruby
+def neste_release version
+  versionsnummer = version.split('.')
+  major = versionsnummer[0].to_i
+  minor = versionsnummer[1].to_i
+  return "#{major}.#{minor+1}.0-SNAPSHOT"
+end
+</code></p>
+
+<h4>mvn release:prepare: 9. Commit the modified POMs</h4>
+
+<p>En commit av neste utviklingsversjon, og her kommer til slutt også push til sentralt repo.</p>
+
+<p><code>ruby
+puts "Sjekker inn ny utviklingsversjon"
+  `git commit pom.xml */pom.xml -m "[release.rb] Ny utviklingsversjon av #{super_pom.artifactId}-#{snapshot_version}"`
+puts "Pusher til sentralt git repository."
+  `git push --tags &amp;&amp; git push origin #{current_branch}`
+</code></p>
+
+<p>Ved å pushe til sentralt repo helt til slutt får vi en atomisk operasjon, slik at evt. rollback blir enkelt.</p>
+
+<h4>mvn release:release: 1. Checkout from an SCM URL with optional tag</h4>
+
+<p>Nå som prepare-steget er ferdig kan releasen-fasen starte. Maven release-pluginen laster ned koden igjen fra tag og bygger. Dette er ikke nødvendig hvis du har distribuert versjonskontroll, da kan du eventuelt få konflikt ved push til master til slutt, men selve bygget blir likt det vi gjorde i steget over. Derfor bygger vi ikke igjen.</p>
+
+<h4>mvn release:release: 2. Run the predefined Maven goals to release the project (by default, deploy site-deploy)</h4>
+
+<p>Vår release-prossess laster opp til artifactory. Dersom denne feiler er det viktig at det gjøres igjen, da releaset kode er pushet til master. Derfor har vi også parametrisert scriptet, slik at denne operasjonen kan gjøres uavhengig av "prepare-steget".</p>
+
+<p>```ruby
+  printf "Laster opp #{local_file} til #{rest_of_path}..."
+  begin</p>
+
+<pre><code>res = RestClient.put(url, File.new(local_file))
+unless res.code &gt;= 200 and res.code &lt; 300
+  raise "Opplasting til Artifactory svarte ikke med HTTP OK, feilmelding var: #{res.message}"
+end
+puts "Opplasting vellykket! Status: #{res.code}"
+</code></pre>
+
+<p>  rescue => e
+```</p>
+
+<h4>mvn release:rollback</h4>
+
+<p>Ved feil før eller under push til sentralt git-repo, må vi resette lokal historie i git. Det blir vårt rollback-steg og utføres manuelt.</p>
+
+<p><code>bash
+git reset --hard origin/HEAD
+</code></p>
+
+<h2>Konklusjon</h2>
+
+<p>Vi bruker Maven kun til bygg, versjonering og avhengigheter. Der fungerer det bra.</p>
+
+<p>Vårt script for release er på ~200 linjer Ruby-kode, og langt over dobbelt så raskt som Maven release-plugin og inneholder kun det vi forstår og våre egne forretningsregler for versjonering etc. Koden er enkel å forstå og endre på. Slike prosesser er bedre egnet for script enn Javakode og blir mer synlig på denne måten.</p>
+
+</div>
+
+  
+  <div class="footer">
+    <div class="contact">
+      <p>
+        Jan Henrik Gundelsby<br />
+        janhenrik@gundelsby.com
+      </p>
+    </div>
+    <div class="contact">
+      <p>
+        <a href="http://github.com/janhenrik/">github.com/janhenrik</a><br />
+        <a href="http://twitter.com/janhenrik/">twitter.com/janhenrik</a><br />
+      </p>
+    </div>
+    <div class="rss">
+      <a href="http://gundelsby.com/atom.xml">
+        <img src="/images/rss.png" alt="Subscribe to RSS Feed" />
+      </a>
+    </div>
+  </div>
+</div>
+</body>
+</html>
