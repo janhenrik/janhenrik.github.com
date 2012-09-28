@@ -4,7 +4,7 @@
  <title>Jan Henrik Gundelsby</title>
  <link href="http://gundelsby.com/atom.xml" rel="self"/>
  <link href="http://gundelsby.com/"/>
- <updated>2012-09-28T09:34:22+02:00</updated>
+ <updated>2012-09-28T09:47:46+02:00</updated>
  <id>http://gundelsby.com/</id>
  <author>
    <name>Jan Henrik Gundelsby</name>
@@ -34,60 +34,45 @@
 
 &lt;p&gt;Dette er lett å implementere. En oneliner med git.&lt;/p&gt;
 
-&lt;p&gt;&lt;code&gt;ruby
-def clean_wd?
+&lt;pre&gt;&lt;code&gt;def clean_wd?
   `git status --porcelain -- . | wc -l`.strip == &quot;0&quot;
 end
-&lt;/code&gt;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h4&gt;mvn release:prepare: 2. Check that there are no SNAPSHOT dependencies&lt;/h4&gt;
 
 &lt;p&gt;Vi bruker &lt;a href=&quot;http://nokogiri.org&quot;&gt;Nokogiri&lt;/a&gt; for å parse XML, Ruby trenger ikke å kjenne til Mavens dependency-tre for de enkle tingene release-prossen skal gjøre. I og med at det er veldefinerte steder i POM-filene SNAPSHOT-dependencies kan være, var dette trivielt.&lt;/p&gt;
 
-&lt;p&gt;```ruby
-def snapshot_dependencies?&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;def snapshot_dependencies?
+    self.search('dependency').each do |dep|
+      dep.search('version').each do |ver|
+        if ver.content =~ /SNAPSHOT/i
+          raise(&quot;Prosjektet #{artifactId} har SNAPSHOT avhengigheter
+               i artifact: #{artifactIdForDep(dep)}-#{ver.content}&quot;)
+        end
+      end
+    end
 
-&lt;pre&gt;&lt;code&gt;self.search('dependency').each do |dep|
-  dep.search('version').each do |ver|
-    if ver.content =~ /SNAPSHOT/i
-      raise(&quot;Prosjektet #{artifactId} har SNAPSHOT avhengigheter
+# Tilsvarende for &amp;lt;properties&amp;gt; og project &amp;gt; parent &amp;gt; version  # for super-pom
 &lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;               i artifact: #{artifactIdForDep(dep)}-#{ver.content}&quot;)&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;    end
-  end
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1&gt;Tilsvarende for &lt;properties&gt; og project &gt; parent &gt; version  # for super-pom&lt;/h1&gt;
-
-&lt;p&gt;```&lt;/p&gt;
 
 &lt;h4&gt;mvn release:prepare: 3. Change the version in the POMs from x-SNAPSHOT to a new version (you will be prompted for the versions to use)&lt;/h4&gt;
 
 &lt;p&gt;Vi har veldefinerte regler for bumping av versjonsnummer. Alltid minor-versjon, evt. patchversjon dersom det er spesifisert på kommandolinjen inn til scriptet.&lt;/p&gt;
 
-&lt;p&gt;```ruby
-def neste_snapshot release_version
+&lt;pre&gt;&lt;code&gt;def neste_snapshot release_version
   versionsnummer = release_version.split('.')
   major = versionsnummer[0].to_i
   minor = versionsnummer[1].to_i
-  patch = versionsnummer[2].to_i&lt;/p&gt;
+  patch = versionsnummer[2].to_i
 
-&lt;p&gt;  if patch == 0&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;return &quot;#{major}.#{minor+1}.0&quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;  else&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;return &quot;#{major}.#{minor}.#{patch+1}&quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;  end
+  if patch == 0
+    return &quot;#{major}.#{minor+1}.0&quot;
+  else
+    return &quot;#{major}.#{minor}.#{patch+1}&quot;
+  end
 end
-```&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h4&gt;mvn release:prepare: 4. Transform the SCM information in the POM to include the final destination of the tag&lt;/h4&gt;
 
@@ -97,62 +82,52 @@ end
 
 &lt;p&gt;Dette er eneste gangen vi bygger prosjektet og sjekker at alle tester kjører.&lt;/p&gt;
 
-&lt;p&gt;```ruby
-mvn_success = system(&quot;mvn -U clean package &gt;&gt; /tmp/mvn_build&quot;)
-  unless mvn_success&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;raise(&quot;Build failure&quot;)
+&lt;pre&gt;&lt;code&gt;mvn_success = system(&quot;mvn -U clean package &amp;gt;&amp;gt; /tmp/mvn_build&quot;)
+  unless mvn_success
+    raise(&quot;Build failure&quot;)
+  end
 &lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;  end
-```&lt;/p&gt;
 
 &lt;h4&gt;mvn release:prepare: 6. Commit the modified POMs&lt;/h4&gt;
 
 &lt;p&gt;Commit av release-versjonen til git.&lt;/p&gt;
 
-&lt;p&gt;&lt;code&gt;``ruby
-&lt;/code&gt;git commit pom.xml */pom.xml -m &quot;[release.rb] Release ny versjon av
-                  #{super_pom.artifactId}-#{release_version}&quot;`&lt;/p&gt;
-
-&lt;p&gt;```&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;`git commit pom.xml */pom.xml -m &quot;[release.rb] Release ny versjon av
+                  #{super_pom.artifactId}-#{release_version}&quot;`
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h4&gt;mvn release:prepare: 7. Tag the code in the SCM with a version name (this will be prompted for)&lt;/h4&gt;
 
 &lt;p&gt;Tag av kode for release-versjonen.&lt;/p&gt;
 
-&lt;p&gt;```ruby
-unless system(&quot;git tag -f #{super_pom.artifactId}-#{release_version}&quot;)&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;raise(&quot;Could not create tag.&quot;)
+&lt;pre&gt;&lt;code&gt;unless system(&quot;git tag -f #{super_pom.artifactId}-#{release_version}&quot;)
+    raise(&quot;Could not create tag.&quot;)
+  end
 &lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;  end
-```&lt;/p&gt;
 
 &lt;h4&gt;mvn release:prepare: 8. Bump the version in the POMs to a new value y-SNAPSHOT (these values will also be prompted for)&lt;/h4&gt;
 
 &lt;p&gt;Igjen er det en veldefinert måte å bumpe versjonsnummer på, denne gangen til neste utviklingsversjon.&lt;/p&gt;
 
-&lt;p&gt;&lt;code&gt;ruby
-def neste_release version
+&lt;pre&gt;&lt;code&gt;def neste_release version
   versionsnummer = version.split('.')
   major = versionsnummer[0].to_i
   minor = versionsnummer[1].to_i
   return &quot;#{major}.#{minor+1}.0-SNAPSHOT&quot;
 end
-&lt;/code&gt;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h4&gt;mvn release:prepare: 9. Commit the modified POMs&lt;/h4&gt;
 
 &lt;p&gt;En commit av neste utviklingsversjon, og her kommer til slutt også push til sentralt repo.&lt;/p&gt;
 
-&lt;p&gt;&lt;code&gt;ruby
-puts &quot;Sjekker inn ny utviklingsversjon&quot;
-  `git commit pom.xml */pom.xml -m &quot;[release.rb] Ny utviklingsversjon av #{super_pom.artifactId}-#{snapshot_version}&quot;`
+&lt;pre&gt;&lt;code&gt;puts &quot;Sjekker inn ny utviklingsversjon&quot;
+  `git commit pom.xml */pom.xml -m 
+    &quot;[release.rb] Ny utviklingsversjon av 
+        #{super_pom.artifactId}-#{snapshot_version}&quot;`
 puts &quot;Pusher til sentralt git repository.&quot;
   `git push --tags &amp;amp;&amp;amp; git push origin #{current_branch}`
-&lt;/code&gt;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Ved å pushe til sentralt repo helt til slutt får vi en atomisk operasjon, slik at evt. rollback blir enkelt.&lt;/p&gt;
 
@@ -164,27 +139,23 @@ puts &quot;Pusher til sentralt git repository.&quot;
 
 &lt;p&gt;Vår release-prossess laster opp til artifactory. Dersom denne feiler er det viktig at det gjøres igjen, da releaset kode er pushet til master. Derfor har vi også parametrisert scriptet, slik at denne operasjonen kan gjøres uavhengig av &quot;prepare-steget&quot;.&lt;/p&gt;
 
-&lt;p&gt;```ruby
-  printf &quot;Laster opp #{local_file} til #{rest_of_path}...&quot;
-  begin&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;res = RestClient.put(url, File.new(local_file))
-unless res.code &amp;gt;= 200 and res.code &amp;lt; 300
-  raise &quot;Opplasting til Artifactory svarte ikke med HTTP OK, feilmelding var: #{res.message}&quot;
-end
-puts &quot;Opplasting vellykket! Status: #{res.code}&quot;
+&lt;pre&gt;&lt;code&gt;  printf &quot;Laster opp #{local_file} til #{rest_of_path}...&quot;
+  begin
+    res = RestClient.put(url, File.new(local_file))
+    unless res.code &amp;gt;= 200 and res.code &amp;lt; 300
+      raise &quot;Opplasting til Artifactory svarte ikke med HTTP OK, 
+        feilmelding var: #{res.message}&quot;
+    end
+    puts &quot;Opplasting vellykket! Status: #{res.code}&quot;
+  rescue =&amp;gt; e
 &lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;  rescue =&gt; e
-```&lt;/p&gt;
 
 &lt;h4&gt;mvn release:rollback&lt;/h4&gt;
 
 &lt;p&gt;Ved feil før eller under push til sentralt git-repo, må vi resette lokal historie i git. Det blir vårt rollback-steg og utføres manuelt.&lt;/p&gt;
 
-&lt;p&gt;&lt;code&gt;bash
-git reset --hard origin/HEAD
-&lt;/code&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;git reset --hard origin/HEAD
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2&gt;Konklusjon&lt;/h2&gt;
 

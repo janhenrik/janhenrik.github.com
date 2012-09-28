@@ -58,60 +58,45 @@
 
 <p>Dette er lett å implementere. En oneliner med git.</p>
 
-<p><code>ruby
-def clean_wd?
+<pre><code>def clean_wd?
   `git status --porcelain -- . | wc -l`.strip == "0"
 end
-</code></p>
+</code></pre>
 
 <h4>mvn release:prepare: 2. Check that there are no SNAPSHOT dependencies</h4>
 
 <p>Vi bruker <a href="http://nokogiri.org">Nokogiri</a> for å parse XML, Ruby trenger ikke å kjenne til Mavens dependency-tre for de enkle tingene release-prossen skal gjøre. I og med at det er veldefinerte steder i POM-filene SNAPSHOT-dependencies kan være, var dette trivielt.</p>
 
-<p>```ruby
-def snapshot_dependencies?</p>
+<pre><code>def snapshot_dependencies?
+    self.search('dependency').each do |dep|
+      dep.search('version').each do |ver|
+        if ver.content =~ /SNAPSHOT/i
+          raise("Prosjektet #{artifactId} har SNAPSHOT avhengigheter
+               i artifact: #{artifactIdForDep(dep)}-#{ver.content}")
+        end
+      end
+    end
 
-<pre><code>self.search('dependency').each do |dep|
-  dep.search('version').each do |ver|
-    if ver.content =~ /SNAPSHOT/i
-      raise("Prosjektet #{artifactId} har SNAPSHOT avhengigheter
+# Tilsvarende for &lt;properties&gt; og project &gt; parent &gt; version  # for super-pom
 </code></pre>
-
-<p>               i artifact: #{artifactIdForDep(dep)}-#{ver.content}")</p>
-
-<pre><code>    end
-  end
-end
-</code></pre>
-
-<h1>Tilsvarende for <properties> og project > parent > version  # for super-pom</h1>
-
-<p>```</p>
 
 <h4>mvn release:prepare: 3. Change the version in the POMs from x-SNAPSHOT to a new version (you will be prompted for the versions to use)</h4>
 
 <p>Vi har veldefinerte regler for bumping av versjonsnummer. Alltid minor-versjon, evt. patchversjon dersom det er spesifisert på kommandolinjen inn til scriptet.</p>
 
-<p>```ruby
-def neste_snapshot release_version
+<pre><code>def neste_snapshot release_version
   versionsnummer = release_version.split('.')
   major = versionsnummer[0].to_i
   minor = versionsnummer[1].to_i
-  patch = versionsnummer[2].to_i</p>
+  patch = versionsnummer[2].to_i
 
-<p>  if patch == 0</p>
-
-<pre><code>return "#{major}.#{minor+1}.0"
-</code></pre>
-
-<p>  else</p>
-
-<pre><code>return "#{major}.#{minor}.#{patch+1}"
-</code></pre>
-
-<p>  end
+  if patch == 0
+    return "#{major}.#{minor+1}.0"
+  else
+    return "#{major}.#{minor}.#{patch+1}"
+  end
 end
-```</p>
+</code></pre>
 
 <h4>mvn release:prepare: 4. Transform the SCM information in the POM to include the final destination of the tag</h4>
 
@@ -121,62 +106,52 @@ end
 
 <p>Dette er eneste gangen vi bygger prosjektet og sjekker at alle tester kjører.</p>
 
-<p>```ruby
-mvn_success = system("mvn -U clean package >> /tmp/mvn_build")
-  unless mvn_success</p>
-
-<pre><code>raise("Build failure")
+<pre><code>mvn_success = system("mvn -U clean package &gt;&gt; /tmp/mvn_build")
+  unless mvn_success
+    raise("Build failure")
+  end
 </code></pre>
-
-<p>  end
-```</p>
 
 <h4>mvn release:prepare: 6. Commit the modified POMs</h4>
 
 <p>Commit av release-versjonen til git.</p>
 
-<p><code>``ruby
-</code>git commit pom.xml */pom.xml -m "[release.rb] Release ny versjon av
-                  #{super_pom.artifactId}-#{release_version}"`</p>
-
-<p>```</p>
+<pre><code>`git commit pom.xml */pom.xml -m "[release.rb] Release ny versjon av
+                  #{super_pom.artifactId}-#{release_version}"`
+</code></pre>
 
 <h4>mvn release:prepare: 7. Tag the code in the SCM with a version name (this will be prompted for)</h4>
 
 <p>Tag av kode for release-versjonen.</p>
 
-<p>```ruby
-unless system("git tag -f #{super_pom.artifactId}-#{release_version}")</p>
-
-<pre><code>raise("Could not create tag.")
+<pre><code>unless system("git tag -f #{super_pom.artifactId}-#{release_version}")
+    raise("Could not create tag.")
+  end
 </code></pre>
-
-<p>  end
-```</p>
 
 <h4>mvn release:prepare: 8. Bump the version in the POMs to a new value y-SNAPSHOT (these values will also be prompted for)</h4>
 
 <p>Igjen er det en veldefinert måte å bumpe versjonsnummer på, denne gangen til neste utviklingsversjon.</p>
 
-<p><code>ruby
-def neste_release version
+<pre><code>def neste_release version
   versionsnummer = version.split('.')
   major = versionsnummer[0].to_i
   minor = versionsnummer[1].to_i
   return "#{major}.#{minor+1}.0-SNAPSHOT"
 end
-</code></p>
+</code></pre>
 
 <h4>mvn release:prepare: 9. Commit the modified POMs</h4>
 
 <p>En commit av neste utviklingsversjon, og her kommer til slutt også push til sentralt repo.</p>
 
-<p><code>ruby
-puts "Sjekker inn ny utviklingsversjon"
-  `git commit pom.xml */pom.xml -m "[release.rb] Ny utviklingsversjon av #{super_pom.artifactId}-#{snapshot_version}"`
+<pre><code>puts "Sjekker inn ny utviklingsversjon"
+  `git commit pom.xml */pom.xml -m 
+    "[release.rb] Ny utviklingsversjon av 
+        #{super_pom.artifactId}-#{snapshot_version}"`
 puts "Pusher til sentralt git repository."
   `git push --tags &amp;&amp; git push origin #{current_branch}`
-</code></p>
+</code></pre>
 
 <p>Ved å pushe til sentralt repo helt til slutt får vi en atomisk operasjon, slik at evt. rollback blir enkelt.</p>
 
@@ -188,27 +163,23 @@ puts "Pusher til sentralt git repository."
 
 <p>Vår release-prossess laster opp til artifactory. Dersom denne feiler er det viktig at det gjøres igjen, da releaset kode er pushet til master. Derfor har vi også parametrisert scriptet, slik at denne operasjonen kan gjøres uavhengig av "prepare-steget".</p>
 
-<p>```ruby
-  printf "Laster opp #{local_file} til #{rest_of_path}..."
-  begin</p>
-
-<pre><code>res = RestClient.put(url, File.new(local_file))
-unless res.code &gt;= 200 and res.code &lt; 300
-  raise "Opplasting til Artifactory svarte ikke med HTTP OK, feilmelding var: #{res.message}"
-end
-puts "Opplasting vellykket! Status: #{res.code}"
+<pre><code>  printf "Laster opp #{local_file} til #{rest_of_path}..."
+  begin
+    res = RestClient.put(url, File.new(local_file))
+    unless res.code &gt;= 200 and res.code &lt; 300
+      raise "Opplasting til Artifactory svarte ikke med HTTP OK, 
+        feilmelding var: #{res.message}"
+    end
+    puts "Opplasting vellykket! Status: #{res.code}"
+  rescue =&gt; e
 </code></pre>
-
-<p>  rescue => e
-```</p>
 
 <h4>mvn release:rollback</h4>
 
 <p>Ved feil før eller under push til sentralt git-repo, må vi resette lokal historie i git. Det blir vårt rollback-steg og utføres manuelt.</p>
 
-<p><code>bash
-git reset --hard origin/HEAD
-</code></p>
+<pre><code>git reset --hard origin/HEAD
+</code></pre>
 
 <h2>Konklusjon</h2>
 
