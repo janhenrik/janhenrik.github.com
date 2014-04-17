@@ -61,14 +61,10 @@
 <div class="highlight"><pre><code class="ruby"><span class="k">def</span> <span class="nf">clean_wd?</span>
   <span class="sb">`git status --porcelain -- . | wc -l`</span><span class="o">.</span><span class="n">strip</span> <span class="o">==</span> <span class="s2">&quot;0&quot;</span>
 <span class="k">end</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
-
-
-<br/>
-
+<p><br/></p>
 
 <h5>mvn release:prepare: 2. Check that there are no SNAPSHOT dependencies</h5>
 
@@ -84,14 +80,10 @@
       <span class="k">end</span>
    <span class="k">end</span>
    <span class="c1"># Tilsvarende for &lt;properties&gt; og project &gt; parent &gt; version  # for super-pom</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
-
-
-<br/>
-
+<p><br/></p>
 
 <h5>mvn release:prepare: 3. Change the version in the POMs from x-SNAPSHOT to a new version (you will be prompted for the versions to use)</h5>
 
@@ -108,14 +100,10 @@
     <span class="k">return</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">major</span><span class="si">}</span><span class="s2">.</span><span class="si">#{</span><span class="n">minor</span><span class="si">}</span><span class="s2">.</span><span class="si">#{</span><span class="n">patch</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span>
   <span class="k">end</span>
 <span class="k">end</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
-
-
-<br/>
-
+<p><br/></p>
 
 <h5>mvn release:prepare: 4. Transform the SCM information in the POM to include the final destination of the tag</h5>
 
@@ -129,14 +117,10 @@
 <span class="k">unless</span> <span class="n">mvn_success</span>
     <span class="k">raise</span><span class="p">(</span><span class="s2">&quot;Build failure&quot;</span><span class="p">)</span>
 <span class="k">end</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
-
-
-<br/>
-
+<p><br/></p>
 
 <h5>mvn release:prepare: 6. Commit the modified POMs</h5>
 
@@ -144,14 +128,10 @@
 
 <div class="highlight"><pre><code class="ruby"> <span class="sb">`git commit pom.xml */pom.xml -m &quot;[release.rb] Release ny versjon av</span>
 <span class="sb">                    </span><span class="si">#{</span><span class="n">super_pom</span><span class="o">.</span><span class="n">artifactId</span><span class="si">}</span><span class="sb">-</span><span class="si">#{</span><span class="n">release_version</span><span class="si">}</span><span class="sb">&quot;`</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
-
-
-<br/>
-
+<p><br/></p>
 
 <h5>mvn release:prepare: 7. Tag the code in the SCM with a version name (this will be prompted for)</h5>
 
@@ -160,14 +140,10 @@
 <div class="highlight"><pre><code class="ruby"><span class="k">unless</span> <span class="nb">system</span><span class="p">(</span><span class="s2">&quot;git tag -f </span><span class="si">#{</span><span class="n">super_pom</span><span class="o">.</span><span class="n">artifactId</span><span class="si">}</span><span class="s2">-</span><span class="si">#{</span><span class="n">release_version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">raise</span><span class="p">(</span><span class="s2">&quot;Could not create tag.&quot;</span><span class="p">)</span>
 <span class="k">end</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
-
-
-<br/>
-
+<p><br/></p>
 
 <h5>mvn release:prepare: 8. Bump the version in the POMs to a new value y-SNAPSHOT (these values will also be prompted for)</h5>
 
@@ -179,14 +155,10 @@
   <span class="n">minor</span> <span class="o">=</span> <span class="n">versionsnummer</span><span class="o">[</span><span class="mi">1</span><span class="o">].</span><span class="n">to_i</span>
   <span class="k">return</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">major</span><span class="si">}</span><span class="s2">.</span><span class="si">#{</span><span class="n">minor</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.0-SNAPSHOT&quot;</span>
 <span class="k">end</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
-
-
-<br/>
-
+<p><br/></p>
 
 <h5>mvn release:prepare: 9. Commit the modified POMs</h5>
 
@@ -197,14 +169,10 @@
 <span class="sb">       </span><span class="si">#{</span><span class="n">super_pom</span><span class="o">.</span><span class="n">artifactId</span><span class="si">}</span><span class="sb">-</span><span class="si">#{</span><span class="n">snapshot_version</span><span class="si">}</span><span class="sb">&quot;`</span>
 <span class="nb">puts</span> <span class="s2">&quot;Pusher til sentralt git repository.&quot;</span>
 <span class="sb">`git push --tags &amp;&amp; git push origin </span><span class="si">#{</span><span class="n">current_branch</span><span class="si">}</span><span class="sb">`</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
-
-
-<br/>
-
+<p><br/></p>
 
 <p>Ved å pushe til sentralt repo helt til slutt får vi en atomisk operasjon, slik at evt. rollback blir enkelt.</p>
 
@@ -225,28 +193,20 @@
   <span class="k">end</span>
   <span class="nb">puts</span> <span class="s2">&quot;Opplasting vellykket! Status: </span><span class="si">#{</span><span class="n">res</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="k">rescue</span> <span class="o">=&gt;</span> <span class="n">e</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
-
-
-<br/>
-
+<p><br/></p>
 
 <h5>mvn release:rollback</h5>
 
 <p>Ved feil før eller under push til sentralt git-repo, må vi resette lokal historie i git. Det blir vårt rollback-steg og utføres manuelt.</p>
 
 <div class="highlight"><pre><code class="ruby"><span class="n">git</span> <span class="n">reset</span> <span class="o">--</span><span class="n">hard</span> <span class="n">origin</span><span class="o">/</span><span class="no">HEAD</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
-
-
-<br/>
-
+<p><br/></p>
 
 <h1>Konklusjon</h1>
 
