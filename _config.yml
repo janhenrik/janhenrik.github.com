@@ -1,2 +1,39 @@
-markdown: rdiscount
-pygments: true
+# Site settings
+title: gundelsby.com
+description: ''
+url: 'http://gundelsby.com'
+baseurl: '/'
+google_analytics: 'UA-35123816-1'
+# disqus_shortname: 'your-disqus-name'
+
+author:
+  name: 'Jan Henrik Gundelsby'
+  email: janhenrik@gundelsby.com
+  twitter_username: janhenrik
+  facebook_username: janhenrik
+  github_username:  janhenrik
+  linkedin_username:  janhenrikgundelsby
+
+defaults:
+  -
+    scope:
+      path: ''
+      type: 'posts'
+    values:
+        layout: 'post'
+
+# Build settings
+destination: _site
+paginate: 10
+permalink: /:year/:title/
+markdown: kramdown
+highlighter: rouge
+
+kramdown:
+  # use Github Flavored Markdown
+  input: GFM
+  # do not replace newlines by <br>s
+  hard_wrap: false
+
+gems: ['jekyll-paginate']
+exclude: ['README.md', 'Gemfile', 'Gemfile.lock', 'screenshot.png']
