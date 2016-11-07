@@ -67,6 +67,16 @@
               </li>
             {% endif %}
 
+            {% if site.author.medium_username %}
+              <!-- Medium -->
+              <li class="navigation__item">
+                <a href="https://medium.com/@janhenrik/{{ site.author.medium_username }}" title="@{{ site.author.medium_username }} on Medium" target="_blank">
+                  <i class="icon icon-social-medium"></i>
+                  <span class="label">Medium</span>
+                </a>
+              </li>
+            {% endif %}
+
             {% if site.author.email %}
               <!-- Email -->
               <li class="navigation__item">
