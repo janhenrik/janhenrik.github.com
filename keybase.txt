@@ -1,0 +1,55 @@
+==================================================================
+https://keybase.io/sirjanhenrik
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of http://gundelsby.com
+  * I am sirjanhenrik (https://keybase.io/sirjanhenrik) on keybase.
+  * I have a public key ASAiO9kOuwbi1bop_hYVS3Esc3hPtbUEFWxuXcPRQ-713go
+
+To do so, I am signing this object:
+
+{
+    "body": {
+        "key": {
+            "eldest_kid": "0120223bd90ebb06e2d5ba29fe16154b712c73784fb5b504156c6e5dc3d143eef5de0a",
+            "host": "keybase.io",
+            "kid": "0120223bd90ebb06e2d5ba29fe16154b712c73784fb5b504156c6e5dc3d143eef5de0a",
+            "uid": "ff589e4a242ba7347b38017cea5f4f19",
+            "username": "sirjanhenrik"
+        },
+        "service": {
+            "hostname": "gundelsby.com",
+            "protocol": "http:"
+        },
+        "type": "web_service_binding",
+        "version": 1
+    },
+    "client": {
+        "name": "keybase.io go client",
+        "version": "1.0.20"
+    },
+    "ctime": 1490114348,
+    "expire_in": 504576000,
+    "merkle_root": {
+        "ctime": 1490114343,
+        "hash": "9c8562e9da2a58ec8cbfd105aced042563fff9283b68c040c772c9f3c1c094024bf0effe9cd2cf020415e392ca47c00967978a4c90cf9c375da493da34e0cf5d",
+        "seqno": 970981
+    },
+    "prev": "fffcf3332321b7ffb6b420033d1cc7b80a834f42e3f85446f8751e90c01cad1e",
+    "seqno": 11,
+    "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEgIjvZDrsG4tW6Kf4WFUtxLHN4T7W1BBVsbl3D0UPu9d4Kp3BheWxvYWTFAvl7ImJvZHkiOnsia2V5Ijp7ImVsZGVzdF9raWQiOiIwMTIwMjIzYmQ5MGViYjA2ZTJkNWJhMjlmZTE2MTU0YjcxMmM3Mzc4NGZiNWI1MDQxNTZjNmU1ZGMzZDE0M2VlZjVkZTBhIiwiaG9zdCI6ImtleWJhc2UuaW8iLCJraWQiOiIwMTIwMjIzYmQ5MGViYjA2ZTJkNWJhMjlmZTE2MTU0YjcxMmM3Mzc4NGZiNWI1MDQxNTZjNmU1ZGMzZDE0M2VlZjVkZTBhIiwidWlkIjoiZmY1ODllNGEyNDJiYTczNDdiMzgwMTdjZWE1ZjRmMTkiLCJ1c2VybmFtZSI6InNpcmphbmhlbnJpayJ9LCJzZXJ2aWNlIjp7Imhvc3RuYW1lIjoiZ3VuZGVsc2J5LmNvbSIsInByb3RvY29sIjoiaHR0cDoifSwidHlwZSI6IndlYl9zZXJ2aWNlX2JpbmRpbmciLCJ2ZXJzaW9uIjoxfSwiY2xpZW50Ijp7Im5hbWUiOiJrZXliYXNlLmlvIGdvIGNsaWVudCIsInZlcnNpb24iOiIxLjAuMjAifSwiY3RpbWUiOjE0OTAxMTQzNDgsImV4cGlyZV9pbiI6NTA0NTc2MDAwLCJtZXJrbGVfcm9vdCI6eyJjdGltZSI6MTQ5MDExNDM0MywiaGFzaCI6IjljODU2MmU5ZGEyYTU4ZWM4Y2JmZDEwNWFjZWQwNDI1NjNmZmY5MjgzYjY4YzA0MGM3NzJjOWYzYzFjMDk0MDI0YmYwZWZmZTljZDJjZjAyMDQxNWUzOTJjYTQ3YzAwOTY3OTc4YTRjOTBjZjljMzc1ZGE0OTNkYTM0ZTBjZjVkIiwic2Vxbm8iOjk3MDk4MX0sInByZXYiOiJmZmZjZjMzMzIzMjFiN2ZmYjZiNDIwMDMzZDFjYzdiODBhODM0ZjQyZTNmODU0NDZmODc1MWU5MGMwMWNhZDFlIiwic2Vxbm8iOjExLCJ0YWciOiJzaWduYXR1cmUifaNzaWfEQK//ZEl/atKQ1jhG+vYX2vliy2bVcLAOcGOJ0sJk+U6djHFaeXxNx1rZzwZPjx8s1mdiUlLUqjNnbhZJ1/hZEwGoc2lnX3R5cGUgpGhhc2iCpHR5cGUIpXZhbHVlxCDpQ3iCaLZWJLBGn99asVTEN5VwFARloDrH8ntZhJ8066N0YWfNAgKndmVyc2lvbgE=
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/sirjanhenrik
+
+==================================================================
+
