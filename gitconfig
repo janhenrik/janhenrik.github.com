@@ -1,0 +1,57 @@
+[user]
+	name = Jan Henrik Gundelsby
+	email = janhenrik@gundelsby.com
+
+[alias]
+    co = checkout
+    ci = commit
+    st = status
+    stat = status
+    changes = diff --name-status -r
+    diffstat = diff --stat -r
+    lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(blue)%an%Creset' --abbrev-commit --date=relative
+    lol = log --pretty=oneline --abbrev-commit --graph --decorate
+    renames = !GIT_PAGER=\"grep -v '^$' | sort -u\" git --paginate log --follow --name-only --pretty=format:'' --
+    amend = commit --amend -C HEAD
+    serve = !git daemon --reuseaddr --verbose  --base-path=. --export-all ./.git
+    rbranch = !sh -c 'git push origin HEAD:refs/heads/$1 && git checkout -t origin/$1' -
+    prune-all = !git remote | xargs -n 1 git remote prune
+    alias = !sh -c '[ $# = 2 ] && git config --global alias.\"$1\" \"$2\" && exit 0 || echo \"usage: git alias <new alias> <original command>\" >&2 && exit 1' -
+    aliases = !git config --get-regexp 'alias.*' | colrm 1 6 | sed 's/[ ]/ = /'
+
+[diff]
+    renameLimit = 0
+    tool = kdiff3
+
+[difftool]
+    prompt = false
+
+[remote "origin"]
+    push = HEAD
+
+[color]
+    branch = auto
+    diff = auto
+    status = auto
+
+[color "branch"]
+       current = yellow reverse
+       local = yellow
+       remote = green
+
+[color "diff"]
+       meta = yellow bold
+       frag = magenta bold
+       old = red bold
+       new = green bold
+
+[color "status"]
+       added = yellow
+       changed = green
+       untracked = cyan
+[core]
+	autocrlf = input
+[filter "lfs"]
+	clean = git-lfs clean %f
+	smudge = git-lfs smudge %f
+	required = true
