@@ -14,9 +14,9 @@ collections:
         name: 'talks'
         file: '_posts/2016-03-21-foredrag.html'
         fields:
-          - { label: 'Body', name: 'body', widget: 'string' }
+          - { label: 'Body', name: 'body', widget: 'code', default_language: 'htmlmixed' }
       - label: 'Research'
         name: 'research'
         file: '_posts/2018-05-27-research-papers.html'
         fields:
-          - { label: 'Body', name: 'body', widget: 'code' }
+          - { label: 'Body', name: 'body', widget: 'text' }
