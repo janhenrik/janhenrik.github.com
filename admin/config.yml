@@ -7,21 +7,16 @@ media_folder: 'assets/uploads'
 collections:
   - name: 'articles'
     label: 'Articles'
-    folder: '_posts/'
     editor:
       preview: false
     files:
       - label: 'Talks'
         name: 'talks'
-        file: '2016-03-21-foredrag.html'
+        file: '_posts/2016-03-21-foredrag.html'
         fields:
-          - { label: 'Title', name: 'title', widget: 'hidden', default: 'about' }
-          - { label: 'Layout', name: 'title', widget: 'hidden', default: 'about' }
-          - { label: 'Body', name: 'body', widget: 'markdown' }
+          - { label: 'Body', name: 'body', widget: 'html' }
       - label: 'Research'
         name: 'research'
-        file: '2018-05-27-research-papers.html'
+        file: '_posts/2018-05-27-research-papers.html'
         fields:
-          - { label: 'Title', name: 'title', widget: 'hidden', default: 'about' }
-          - { label: 'Layout', name: 'title', widget: 'hidden', default: 'about' }
           - { label: 'Body', name: 'body', widget: 'html' }
